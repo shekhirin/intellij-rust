@@ -91,16 +91,21 @@ class CargoBuildTaskRunner : ProjectTaskRunner() {
         return resultPromise
     }
 
-    override fun canRun(projectTask: ProjectTask): Boolean =
-        when (projectTask) {
-            is ModuleBuildTask ->
-                projectTask.module.cargoProjectRoot != null
+    override fun canRun(projectTask: ProjectTask): Boolean {
+        return when (projectTask) {
+            is ModuleBuildTask -> {
+                if (projectTask.module.cargoProjectRoot != null) return true
+                val runManager = RunManager.getInstance(projectTask.module.project)
+                val buildableElement = runManager.selectedConfiguration?.configuration
+                buildableElement is CargoCommandConfiguration && buildableElement.isBuildToolWindowAvailable
+            }
             is ProjectModelBuildTask<*> -> {
                 val buildableElement = projectTask.buildableElement
                 buildableElement is CargoBuildConfiguration && buildableElement.enabled
             }
             else -> false
         }
+    }
 
     fun expandTask(task: ProjectTask): List<ProjectTask> {
         if (task !is ModuleBuildTask) return listOf(task)
