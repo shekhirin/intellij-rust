@@ -5,6 +5,10 @@
 
 package org.rust.ide.annotator
 
+import com.intellij.codeInsight.daemon.HighlightDisplayKey
+import com.intellij.codeInspection.SuppressIntentionAction
+import com.intellij.codeInspection.SuppressIntentionActionFromFix.convertBatchToSuppressIntentionActions
+import com.intellij.codeInspection.SuppressableProblemGroup
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.Disposable
@@ -20,6 +24,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.wm.WindowManager
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.impl.AnyPsiChangeListener
 import com.intellij.psi.impl.PsiManagerImpl
@@ -36,6 +41,8 @@ import org.rust.cargo.toolchain.tools.cargoOrWrapper
 import org.rust.ide.annotator.RsExternalLinterFilteredMessage.Companion.filterMessage
 import org.rust.ide.annotator.RsExternalLinterUtils.TEST_MESSAGE
 import org.rust.ide.annotator.fixes.ApplySuggestionFix
+import org.rust.ide.inspections.lints.RsLint
+import org.rust.ide.inspections.lints.RsSuppressQuickFix.Companion.createSuppressFixes
 import org.rust.ide.status.RsExternalLinterWidget
 import org.rust.lang.RsConstants
 import org.rust.lang.core.psi.RsFile
@@ -46,6 +53,7 @@ import org.rust.stdext.unwrapOrElse
 import java.nio.file.Path
 import java.time.Duration
 import java.time.Instant
+import java.util.*
 import java.util.concurrent.CompletableFuture
 
 object RsExternalLinterUtils {
@@ -192,16 +200,27 @@ fun AnnotationHolder.createAnnotationsForFile(
         val annotationBuilder = newAnnotation(message.severity, annotationMessage)
             .tooltip(message.htmlTooltip)
             .range(message.textRange)
-            .problemGroup { annotationMessage }
+            .problemGroup(object : SuppressableProblemGroup {
+                override fun getProblemName(): String = annotationMessage
+                override fun getSuppressActions(element: PsiElement?): Array<SuppressIntentionAction> {
+                    if (element == null || message.lint == null) return emptyArray()
+                    return convertBatchToSuppressIntentionActions(createSuppressFixes(element, message.lint))
+                }
+            })
             .needsUpdateOnTyping(true)
 
         message.quickFixes
             .singleOrNull { it.applicability <= minApplicability }
-            ?.let { f -> annotationBuilder.withFix(f) }
+            ?.let { f ->
+                val key = HighlightDisplayKey.findOrRegister(RUST_EXTERNAL_LINTER_ID, "Rust external linter")
+                annotationBuilder.newFix(f).key(key).registerFix()
+            }
 
         annotationBuilder.create()
     }
 }
+
+private const val RUST_EXTERNAL_LINTER_ID: String = "RsExternalLinterOptions"
 
 class RsExternalLinterResult(commandOutput: List<String>, val executionTime: Long) {
     val messages: List<CargoTopMessage> = commandOutput.asSequence()
@@ -220,6 +239,7 @@ private data class RsExternalLinterFilteredMessage(
     val textRange: TextRange,
     val message: String,
     val htmlTooltip: String,
+    val lint: RsLint.ExternalLinterLint?,
     val quickFixes: List<ApplySuggestionFix>
 ) {
     companion object {
@@ -270,6 +290,7 @@ private data class RsExternalLinterFilteredMessage(
                 textRange,
                 message.message.capitalize(),
                 tooltip,
+                message.code?.code?.let { RsLint.ExternalLinterLint(it) },
                 message.collectQuickFixes(file, document)
             )
         }
