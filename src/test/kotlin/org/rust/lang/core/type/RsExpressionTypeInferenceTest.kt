@@ -1706,4 +1706,15 @@ class RsExpressionTypeInferenceTest : RsTypificationTestBase() {
           //^ *mut i32
         }
     """)
+
+    fun `test type of multi-resolved method is unknown`() = testExpr("""
+        struct S;
+        impl S { fn foo(&self) -> i32 { 0 } }
+        impl S { fn foo(&self) -> u32 { 0 } }
+        fn main() {
+            let a = S.foo();
+            a;
+          //^ <unknown>
+        }
+    """)
 }

@@ -637,7 +637,7 @@ class RsTypeInferenceWalker(
             val variantsForDisplay = (callee?.let(::listOf) ?: variants)
             ctx.writeResolvedMethod(methodCall, variantsForDisplay)
 
-            callee ?: variants.firstOrNull()
+            callee
         }
         if (callee == null) {
             val methodType = unknownTyFunction(argExprs.size)
@@ -730,7 +730,9 @@ class RsTypeInferenceWalker(
         variants: List<MethodResolveVariant>,
         methodCall: RsMethodCall
     ): MethodResolveVariant? {
-        val filtered = filterAssocItems(variants, methodCall).singleOrLet { list ->
+        val filtered = run {
+            val list = filterAssocItems(variants, methodCall)
+
             // 4. Pick results matching receiver type
             TypeInferenceMarks.MethodPickDerefOrder.hit()
 
