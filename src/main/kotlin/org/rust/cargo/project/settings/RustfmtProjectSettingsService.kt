@@ -5,6 +5,7 @@
 
 package org.rust.cargo.project.settings
 
+import com.intellij.ide.util.PropertiesComponent
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project
@@ -31,6 +32,15 @@ class RustfmtProjectSettingsService(
         }
     }
 
+    // BACKCOMPAT: 2022.2
+    override fun loadState(state: RustfmtState) {
+        if (state.runRustfmtOnSave) {
+            PropertiesComponent.getInstance(project).setValue("format.on.save", true)
+            state.runRustfmtOnSave = false
+        }
+        super.loadState(state)
+    }
+
     @TestOnly
     fun modifyTemporary(parentDisposable: Disposable, action: (RustfmtState) -> Unit) {
         val oldState = state
@@ -46,6 +56,7 @@ class RustfmtProjectSettingsService(
         var channel by enum(RustChannel.DEFAULT)
         var envs by map<String, String>()
         var useRustfmt by property(false)
+        // BACKCOMPAT: 2022.2
         var runRustfmtOnSave by property(false)
 
         fun copy(): RustfmtState {
