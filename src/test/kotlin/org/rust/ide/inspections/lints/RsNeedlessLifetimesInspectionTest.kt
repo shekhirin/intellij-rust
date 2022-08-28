@@ -355,6 +355,14 @@ class RsNeedlessLifetimesInspectionTest : RsInspectionsTestBase(RsNeedlessLifeti
         fn foo2<'a>(_: &'a str) {}
     """)
 
+    fun `test async fn`() = checkByText("""
+        struct S<'a>(&'a str);
+
+        async <weak_warning>fn foo1<'a>(a: S<'a>) -> S<'a></weak_warning> {}
+
+        async fn foo2<'a>(a: &'a str) -> &'a str {}
+    """)
+
     private fun doTest(
         @Language("Rust") text: String
     ) = checkFixIsUnavailable(FIX_NAME, text, checkWeakWarn = true)

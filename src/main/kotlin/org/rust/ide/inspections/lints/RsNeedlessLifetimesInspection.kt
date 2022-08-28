@@ -54,6 +54,7 @@ class RsNeedlessLifetimesInspection : RsLintInspection() {
  * - no output references, all input references have different LT
  * - output references, exactly one input reference with same LT
  * All lifetimes must be unnamed, 'static or defined without bounds on the level of the current item.
+ * Note: async fn syntax does not allow lifetime elision outside of & and &mut references.
  */
 private fun couldUseElision(fn: RsFunction): Boolean {
     if (hasWhereLifetimes(fn.whereClause)) return false
@@ -61,8 +62,11 @@ private fun couldUseElision(fn: RsFunction): Boolean {
     val typeParametersBounds = fn.typeParameters.flatMap { it.bounds }.map { it.bound }
     if (typeParametersBounds.any { hasNamedReferenceLifetime(it) }) return false
 
-    val (inputLifetimes, outputLifetimes) = collectLifetimesFromFnSignature(fn)
-        ?: return false
+    val (inputLifetimeCollector, outputLifetimesCollector) = collectLifetimesFromFnSignature(fn) ?: return false
+    val inputLifetimes = inputLifetimeCollector.lifetimes
+    val outputLifetimes = outputLifetimesCollector.lifetimes
+
+    if (fn.isAsync && (inputLifetimeCollector.hasLifetimeInRef || outputLifetimesCollector.hasLifetimeInRef)) return false
 
     // no input lifetimes? easy case!
     if (inputLifetimes.isEmpty()) return false
@@ -101,6 +105,7 @@ private fun couldUseElision(fn: RsFunction): Boolean {
 
 private class LifetimesCollector(val isForInputParams: Boolean = false) : RsRecursiveVisitor() {
     var abort: Boolean = false
+    var hasLifetimeInRef: Boolean = false
     val lifetimes = mutableListOf<ReferenceLifetime>()
 
     override fun visitSelfParameter(selfParameter: RsSelfParameter) {
@@ -141,7 +146,10 @@ private class LifetimesCollector(val isForInputParams: Boolean = false) : RsRecu
         super.visitPath(path)
     }
 
-    override fun visitLifetime(lifetime: RsLifetime) = record(lifetime)
+    override fun visitLifetime(lifetime: RsLifetime) {
+        hasLifetimeInRef = hasLifetimeInRef || lifetime.parent is RsRefLikeType
+        record(lifetime)
+    }
 
     override fun visitElement(element: RsElement) {
         if (abort || element is RsItemElement /* ignore nested items */) return
@@ -181,9 +189,9 @@ private class BodyLifetimeChecker : RsVisitor() {
     }
 }
 
-private fun collectLifetimesFromFnSignature(fn: RsFunction): Pair<List<ReferenceLifetime>, List<ReferenceLifetime>>? {
+private fun collectLifetimesFromFnSignature(fn: RsFunction): Pair<LifetimesCollector, LifetimesCollector>? {
     // these will collect all the lifetimes for references in arg/return types
-    val inputCollector = LifetimesCollector(true)
+    val inputCollector = LifetimesCollector(isForInputParams = true)
     val outputCollector = LifetimesCollector()
 
     // extract lifetimes in input argument types
@@ -197,7 +205,7 @@ private fun collectLifetimesFromFnSignature(fn: RsFunction): Pair<List<Reference
     fn.retType?.typeReference?.accept(outputCollector)
     if (outputCollector.abort) return null
 
-    return Pair(inputCollector.lifetimes, outputCollector.lifetimes)
+    return inputCollector to outputCollector
 }
 
 private fun allowedLifetimesFrom(lifetimeParameters: List<RsLifetimeParameter>): Set<ReferenceLifetime> {
