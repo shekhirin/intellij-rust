@@ -36,13 +36,11 @@ import org.jetbrains.annotations.TestOnly
 import org.rust.cargo.project.model.cargoProjects
 import org.rust.cargo.runconfig.CargoCommandRunner
 import org.rust.cargo.runconfig.CargoRunState
-import org.rust.cargo.runconfig.RsCommandConfiguration
 import org.rust.cargo.runconfig.addFormatJsonOption
 import org.rust.cargo.runconfig.command.CargoCommandConfiguration
 import org.rust.cargo.runconfig.command.ParsedCommand
 import org.rust.cargo.runconfig.command.hasRemoteTarget
 import org.rust.cargo.runconfig.target.localBuildArgsForRemoteRun
-import org.rust.cargo.runconfig.wasmpack.WasmPackBuildTaskProvider
 import org.rust.cargo.toolchain.CargoCommandLine
 import org.rust.cargo.util.CargoArgsParser.Companion.parseArgs
 import org.rust.cargo.util.parseSemVer
@@ -57,21 +55,12 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.Future
 
 object CargoBuildManager {
-    private val BUILDABLE_COMMANDS: List<String> = listOf("run", "test")
+    private val BUILDABLE_COMMANDS: List<String> = listOf("run", "test", "bench")
 
     private val CANCELED_BUILD_RESULT: Future<CargoBuildResult> =
         CompletableFuture.completedFuture(CargoBuildResult(succeeded = false, canceled = true, started = 0))
 
     private val MIN_RUSTC_VERSION: SemVer = "1.48.0".parseSemVer()
-
-    val RsCommandConfiguration.isBuildToolWindowEnabled: Boolean
-        get() {
-            if (!project.isBuildToolWindowAvailable) return false
-            return beforeRunTasks.any { task ->
-                task is CargoBuildTaskProvider.BuildTask ||
-                    task is WasmPackBuildTaskProvider.BuildTask
-            }
-        }
 
     val Project.isBuildToolWindowAvailable: Boolean
         get() {
@@ -116,7 +105,7 @@ object CargoBuildManager {
             environment = environment,
             taskName = "Build",
             progressTitle = "Building...",
-            isTestBuild = state.commandLine.command == "test",
+            isTestBuild = state.commandLine.command in listOf("test", "bench"),
             buildId = buildId,
             parentId = buildId
         )) {
@@ -218,7 +207,7 @@ object CargoBuildManager {
         val parsed = ParsedCommand.parse(configuration.command) ?: return false
         return when (val command = parsed.command) {
             "build", "check", "clippy" -> true
-            "test" -> {
+            "test", "bench" -> {
                 val (commandArguments, _) = parseArgs(command, parsed.additionalArguments)
                 "--no-run" in commandArguments
             }
@@ -242,6 +231,7 @@ object CargoBuildManager {
         buildConfiguration.command = ParametersListUtil.join(when (parsed.command) {
             "run" -> listOfNotNull(parsed.toolchain, "build", *commandArguments.toTypedArray())
             "test" -> listOfNotNull(parsed.toolchain, "test", "--no-run", *commandArguments.toTypedArray())
+            "bench" -> listOfNotNull(parsed.toolchain, "bench", "--no-run", *commandArguments.toTypedArray())
             else -> return null
         })
 
