@@ -42,6 +42,8 @@ import org.rust.cargo.project.model.CargoProject
 import org.rust.cargo.project.model.CargoProjectsService
 import org.rust.cargo.project.model.CargoProjectsService.CargoProjectsListener
 import org.rust.cargo.project.model.cargoProjects
+import org.rust.cargo.project.settings.RsProjectSettingsServiceBase.*
+import org.rust.cargo.project.settings.RsProjectSettingsServiceBase.Companion.RUST_SETTINGS_TOPIC
 import org.rust.cargo.project.settings.RustProjectSettingsService
 import org.rust.cargo.project.settings.rustSettings
 import org.rust.cargo.project.workspace.PackageOrigin
@@ -546,8 +548,9 @@ private class MacroExpansionServiceImplInner(
         connect.subscribe(CargoProjectsService.CARGO_PROJECTS_TOPIC, treeChangeListener)
         project.rustPsiManager.subscribeRustPsiChange(connect, treeChangeListener)
 
-        connect.subscribe(RustProjectSettingsService.RUST_SETTINGS_TOPIC, object : RustProjectSettingsService.RustSettingsListener {
-            override fun rustSettingsChanged(e: RustProjectSettingsService.RustSettingsChangedEvent) {
+        connect.subscribe(RUST_SETTINGS_TOPIC, object : RsSettingsListener {
+            override fun <T : StateBase<T>> settingsChanged(e: SettingsChangedEventBase<T>) {
+                if (e !is RustProjectSettingsService.SettingsChangedEvent) return
                 if (!e.affectsCargoMetadata) { // if affect cargo metadata, will be invoked by CARGO_PROJECTS_TOPIC
                     if (e.isChanged(RustProjectSettingsService.State::macroExpansionEngine)) {
                         settingsChanged()

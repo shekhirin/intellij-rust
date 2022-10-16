@@ -17,12 +17,15 @@ import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import org.rust.RsBundle
 import org.rust.cargo.project.model.isNewProjectModelImportEnabled
+import org.rust.cargo.project.settings.RustProjectSettingsService
+import org.rust.cargo.project.settings.rustSettings
 import java.awt.Component
 
 class CargoConfigurable(
     project: Project,
     private val isPlaceholder: Boolean
 ) : RsConfigurableBase(project, RsBundle.message("settings.rust.cargo.name")) {
+    private val settings: RustProjectSettingsService = project.rustSettings
 
     override fun createPanel(): DialogPanel {
         return if (isPlaceholder) createPlaceholderPanel() else createSettingsPanel()
@@ -43,25 +46,25 @@ class CargoConfigurable(
 
         row {
             checkBox(RsBundle.message("settings.rust.cargo.show.first.error.label"))
-                .bindSelected(state::autoShowErrorsInEditor)
+                .bindSelected(settings.state::autoShowErrorsInEditor)
         }
         // Project model updates is controlled with `Preferences | Build, Execution, Deployment | Build Tools` settings
         // in case of new approach
         if (!isNewProjectModelImportEnabled) {
             row {
                 checkBox(RsBundle.message("settings.rust.cargo.auto.update.project.label"))
-                    .bindSelected(state::autoUpdateEnabled)
+                    .bindSelected(settings.state::autoUpdateEnabled)
             }
         }
         row {
             checkBox(RsBundle.message("settings.rust.cargo.compile.all.targets.label"))
                 .comment(RsBundle.message("settings.rust.cargo.compile.all.targets.comment"))
-                .bindSelected(state::compileAllTargets)
+                .bindSelected(settings.state::compileAllTargets)
         }
         row {
             checkBox(RsBundle.message("settings.rust.cargo.offline.mode.label"))
                 .comment(RsBundle.message("settings.rust.cargo.offline.mode.comment"))
-                .bindSelected(state::useOffline)
+                .bindSelected(settings.state::useOffline)
         }
     }
 

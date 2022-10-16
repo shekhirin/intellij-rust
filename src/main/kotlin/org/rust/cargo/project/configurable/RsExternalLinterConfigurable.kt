@@ -11,33 +11,43 @@ import com.intellij.ui.EnumComboBoxModel
 import com.intellij.ui.dsl.builder.*
 import org.rust.RsBundle
 import org.rust.cargo.project.model.cargoProjects
+import org.rust.cargo.project.settings.RsExternalLinterProjectSettingsService
+import org.rust.cargo.project.settings.externalLinterSettings
 import org.rust.cargo.toolchain.ExternalLinter
 import org.rust.cargo.util.CargoCommandCompletionProvider
 import org.rust.cargo.util.RsCommandLineEditor
 import org.rust.openapiext.fullWidthCell
 
 class RsExternalLinterConfigurable(project: Project) : RsConfigurableBase(project, RsBundle.message("settings.rust.external.linters.name")) {
-    override fun createPanel(): DialogPanel = panel {
-        row(RsBundle.message("settings.rust.external.linters.tool.label")) {
-            comboBox(EnumComboBoxModel(ExternalLinter::class.java))
-                .comment(RsBundle.message("settings.rust.external.linters.tool.comment"))
-                .bindItem(state::externalLinter.toNullableProperty())
-        }
+    private val settings: RsExternalLinterProjectSettingsService = project.externalLinterSettings
 
-        row(RsBundle.message("settings.rust.external.linters.additional.arguments.label")) {
-            fullWidthCell(RsCommandLineEditor(project, CargoCommandCompletionProvider(project.cargoProjects, "check ") { null }))
-                .comment(RsBundle.message("settings.rust.external.linters.additional.arguments.comment"))
-                .bind(
-                    componentGet = { it.text },
-                    componentSet = { component, value -> component.text = value },
-                    prop = state::externalLinterArguments.toMutableProperty()
-                )
-        }
+    private val additionalArguments: RsCommandLineEditor =
+        RsCommandLineEditor(project, CargoCommandCompletionProvider(project.cargoProjects, "check ") { null })
+
+    override fun createPanel(): DialogPanel = panel {
+        group(indent = false) {
+            row(RsBundle.message("settings.rust.external.linters.tool.label")) {
+                comboBox(EnumComboBoxModel(ExternalLinter::class.java))
+                    .comment(RsBundle.message("settings.rust.external.linters.tool.comment"))
+                    .bindItem(settings.state::tool.toNullableProperty())
+            }
+
+            row(RsBundle.message("settings.rust.external.linters.additional.arguments.label")) {
+                fullWidthCell(additionalArguments)
+                    .resizableColumn()
+                    .comment(RsBundle.message("settings.rust.external.linters.additional.arguments.comment"))
+                    .bind(
+                        componentGet = { it.text },
+                        componentSet = { component, value -> component.text = value },
+                        prop = settings.state::additionalArguments.toMutableProperty()
+                    )
+            }
+        }.bottomGap(BottomGap.MEDIUM) // TODO: do we really need it?
 
         row {
             checkBox(RsBundle.message("settings.rust.external.linters.on.the.fly.label"))
                 .comment(RsBundle.message("settings.rust.external.linters.on.the.fly.comment"))
-                .bindSelected(state::runExternalLinterOnTheFly)
+                .bindSelected(settings.state::runOnTheFly)
         }
     }
 }

@@ -14,7 +14,9 @@ import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
 import org.rust.RsBundle
 import org.rust.cargo.project.model.cargoProjects
+import org.rust.cargo.project.settings.RustProjectSettingsService
 import org.rust.cargo.project.settings.RustProjectSettingsService.MacroExpansionEngine
+import org.rust.cargo.project.settings.rustSettings
 import org.rust.cargo.project.settings.ui.RustProjectSettingsPanel
 import org.rust.cargo.toolchain.RsToolchainBase
 import org.rust.openapiext.pathAsPath
@@ -23,6 +25,7 @@ import java.nio.file.Paths
 class RsProjectConfigurable(
     project: Project
 ) : RsConfigurableBase(project, RsBundle.message("settings.rust.toolchain.name")), Configurable.NoScroll {
+    private val settings: RustProjectSettingsService = project.rustSettings
     private val projectDir = project.cargoProjects.allProjects.firstOrNull()?.rootDir?.pathAsPath ?: Paths.get(".")
     private val rustProjectSettings = RustProjectSettingsPanel(projectDir)
 
@@ -32,13 +35,13 @@ class RsProjectConfigurable(
             checkBox(RsBundle.message("settings.rust.toolchain.expand.macros.checkbox"))
                 .comment(RsBundle.message("settings.rust.toolchain.expand.macros.comment"))
                 .bindSelected(
-                    { state.macroExpansionEngine != MacroExpansionEngine.DISABLED },
-                    { state.macroExpansionEngine = if (it) MacroExpansionEngine.NEW else MacroExpansionEngine.DISABLED }
+                    { settings.state.macroExpansionEngine != MacroExpansionEngine.DISABLED },
+                    { settings.state.macroExpansionEngine = if (it) MacroExpansionEngine.NEW else MacroExpansionEngine.DISABLED }
                 )
         }
         row {
             checkBox(RsBundle.message("settings.rust.toolchain.inject.rust.in.doc.comments.checkbox"))
-                .bindSelected(state::doctestInjectionEnabled)
+                .bindSelected(settings.state::doctestInjectionEnabled)
         }
     }
 
@@ -49,25 +52,28 @@ class RsProjectConfigurable(
 
     override fun reset() {
         super.reset()
-        val toolchain = state.toolchain ?: RsToolchainBase.suggest(projectDir)
+        val toolchain = settings.toolchain ?: RsToolchainBase.suggest(projectDir)
 
         rustProjectSettings.data = RustProjectSettingsPanel.Data(
             toolchain = toolchain,
-            explicitPathToStdlib = state.explicitPathToStdlib
+            explicitPathToStdlib = settings.explicitPathToStdlib
         )
     }
 
     override fun isModified(): Boolean {
         if (super.isModified()) return true
         val data = rustProjectSettings.data
-        return data.toolchain?.location != state.toolchain?.location
-            || data.explicitPathToStdlib != state.explicitPathToStdlib
+        return data.toolchain?.location != settings.toolchain?.location
+            || data.explicitPathToStdlib != settings.explicitPathToStdlib
     }
 
     @Throws(ConfigurationException::class)
-    override fun doApply() {
+    override fun apply() {
         rustProjectSettings.validateSettings()
-        state.toolchain = rustProjectSettings.data.toolchain
-        state.explicitPathToStdlib = rustProjectSettings.data.explicitPathToStdlib
+        settings.modify {
+            it.toolchain = rustProjectSettings.data.toolchain
+            it.explicitPathToStdlib = rustProjectSettings.data.explicitPathToStdlib
+        }
+        super.apply()
     }
 }

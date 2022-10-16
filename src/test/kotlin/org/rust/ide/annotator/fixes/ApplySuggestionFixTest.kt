@@ -9,7 +9,7 @@ import com.intellij.codeInsight.intention.IntentionAction
 import org.intellij.lang.annotations.Language
 import org.rust.MinRustcVersion
 import org.rust.cargo.RsWithToolchainTestBase
-import org.rust.cargo.project.settings.rustSettings
+import org.rust.cargo.project.settings.externalLinterSettings
 import org.rust.cargo.toolchain.ExternalLinter
 import org.rust.fileTree
 import org.rust.replaceCaretMarker
@@ -18,7 +18,7 @@ class ApplySuggestionFixTest : RsWithToolchainTestBase() {
 
     override fun setUp() {
         super.setUp()
-        project.rustSettings.modifyTemporary(testRootDisposable) { it.runExternalLinterOnTheFly = true }
+        project.externalLinterSettings.modifyTemporary(testRootDisposable) { it.runOnTheFly = true }
     }
 
     fun `test rustc suggestion (machine applicable)`() = checkFixByText("""
@@ -113,7 +113,7 @@ class ApplySuggestionFixTest : RsWithToolchainTestBase() {
     }
 
     private fun getQuickFixes(@Language("Rust") text: String, externalLinter: ExternalLinter): List<IntentionAction> {
-        project.rustSettings.modifyTemporary(testRootDisposable) { it.externalLinter = externalLinter }
+        project.externalLinterSettings.modifyTemporary(testRootDisposable) { it.tool = externalLinter }
         fileTree {
             toml("Cargo.toml", """
                 [package]

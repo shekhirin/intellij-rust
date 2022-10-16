@@ -19,7 +19,7 @@ class RustfmtProjectSettingsServiceTest : LightPlatformTestCase() {
 
         @Language("XML")
         val text = """
-            <RustfmtState>
+            <State>
               <option name="additionalArguments" value="--unstable-features" />
               <option name="channel" value="nightly" />
               <option name="envs">
@@ -29,24 +29,24 @@ class RustfmtProjectSettingsServiceTest : LightPlatformTestCase() {
               </option>
               <option name="runRustfmtOnSave" value="true" />
               <option name="useRustfmt" value="true" />
-            </RustfmtState>
+            </State>
         """.trimIndent()
         service.loadState(stateFromXmlString(text))
 
-        val actual = service.state
-        assertEquals(text, XmlSerializer.serialize(actual).toXmlString())
+        val actual = XmlSerializer.serialize(service.state).toXmlString()
+        assertEquals(text, actual)
 
-        assertEquals("--unstable-features", actual.additionalArguments)
-        assertEquals(RustChannel.NIGHTLY, actual.channel)
-        assertEquals(mapOf("ABC" to "123"), actual.envs)
-        assertEquals(true, actual.useRustfmt)
-        assertEquals(true, actual.runRustfmtOnSave)
+        assertEquals("--unstable-features", service.additionalArguments)
+        assertEquals(RustChannel.NIGHTLY, service.channel)
+        assertEquals(mapOf("ABC" to "123"), service.envs)
+        assertEquals(true, service.useRustfmt)
+        assertEquals(true, service.runRustfmtOnSave)
     }
 
     companion object {
-        private fun stateFromXmlString(xml: String): RustfmtProjectSettingsService.RustfmtState {
+        private fun stateFromXmlString(xml: String): RustfmtProjectSettingsService.State {
             val element = elementFromXmlString(xml)
-            return XmlSerializer.deserialize(element, RustfmtProjectSettingsService.RustfmtState::class.java)
+            return XmlSerializer.deserialize(element, RustfmtProjectSettingsService.State::class.java)
         }
     }
 }

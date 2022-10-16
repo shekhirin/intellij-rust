@@ -6,7 +6,6 @@
 package org.rust.cargo.project.configurable
 
 import com.intellij.execution.configuration.EnvironmentVariablesComponent
-import com.intellij.openapi.options.BoundConfigurable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.DialogPanel
@@ -17,23 +16,25 @@ import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.toMutableProperty
 import org.rust.RsBundle
+import org.rust.cargo.project.settings.RustfmtProjectSettingsService
 import org.rust.cargo.project.settings.rustfmtSettings
 import org.rust.cargo.toolchain.RustChannel
 import org.rust.openapiext.fullWidthCell
+import javax.swing.JLabel
 
-class RustfmtConfigurable(project: Project) : BoundConfigurable(RsBundle.message("settings.rust.rustfmt.name")) {
-    private val settings = project.rustfmtSettings
+class RustfmtConfigurable(project: Project) : RsConfigurableBase(project, RsBundle.message("settings.rust.rustfmt.name")) {
+    private val settings: RustfmtProjectSettingsService = project.rustfmtSettings
 
-    private val additionalArguments = RawCommandLineEditor()
+    private val additionalArguments: RawCommandLineEditor = RawCommandLineEditor()
 
-    private val channelLabel = Label(RsBundle.message("settings.rust.rustfmt.channel.label"))
-    private val channel = ComboBox<RustChannel>().apply {
+    private val channelLabel: JLabel = Label(RsBundle.message("settings.rust.rustfmt.channel.label"))
+    private val channel: ComboBox<RustChannel> = ComboBox<RustChannel>().apply {
         RustChannel.values()
             .sortedBy { it.index }
             .forEach { addItem(it) }
     }
 
-    private val environmentVariables = EnvironmentVariablesComponent()
+    private val environmentVariables: EnvironmentVariablesComponent = EnvironmentVariablesComponent()
 
     override fun createPanel(): DialogPanel = panel {
         group(indent = false) {
