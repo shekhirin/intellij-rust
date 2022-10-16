@@ -10,6 +10,7 @@ import com.intellij.openapi.components.StoragePathMacros
 import com.intellij.openapi.project.Project
 import org.rust.cargo.project.settings.RsExternalLinterProjectSettingsService.State
 import org.rust.cargo.toolchain.ExternalLinter
+import org.rust.cargo.toolchain.RustChannel
 
 val Project.externalLinterSettings: RsExternalLinterProjectSettingsService
     get() = getService(RsExternalLinterProjectSettingsService::class.java)
@@ -21,6 +22,8 @@ private const val serviceName: String = "RsExternalLinterProjectSettings"
 class RsExternalLinterProjectSettingsService(project: Project) : RsProjectSettingsServiceBase<State>(project, State()) {
     val tool: ExternalLinter get() = state.tool
     val additionalArguments: String get() = state.additionalArguments
+    val channel: RustChannel get() = state.channel
+    val envs: Map<String, String> get() = state.envs
     val runOnTheFly: Boolean get() = state.runOnTheFly
 
     override fun noStateLoaded() {
@@ -38,6 +41,10 @@ class RsExternalLinterProjectSettingsService(project: Project) : RsProjectSettin
         var tool by enum(ExternalLinter.DEFAULT)
         @AffectsHighlighting
         var additionalArguments by property("") { it.isEmpty() }
+        @AffectsHighlighting
+        var channel by enum(RustChannel.DEFAULT)
+        @AffectsHighlighting
+        var envs by map<String, String>()
         @AffectsHighlighting
         var runOnTheFly by property(false)
 
