@@ -546,7 +546,7 @@ fun collectVariantsForEnumCompletion(
 
                     if (candidate != null && RsCodeInsightSettings.getInstance().importOutOfScopeItems) {
                         context.commitDocument()
-                        context.getElementOfType<RsElement>()?.let { it -> candidate.import(it) }
+                        context.getElementOfType<RsElement>()?.let { candidate.import(it) }
                     }
                 }
             }

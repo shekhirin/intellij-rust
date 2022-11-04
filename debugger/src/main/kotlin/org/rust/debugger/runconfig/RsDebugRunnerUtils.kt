@@ -108,6 +108,7 @@ object RsDebugRunnerUtils {
             arrayOf(action),
             Messages.OK,
             Messages.getErrorIcon(),
+            @Suppress("removal", "DEPRECATION")
             object : DialogWrapper.DoNotAskOption.Adapter() {
                 override fun rememberChoice(isSelected: Boolean, exitCode: Int) {
                     if (exitCode == Messages.OK) {
