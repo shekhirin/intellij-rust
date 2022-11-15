@@ -371,6 +371,41 @@ class RsSmartEnterProcessorTest : RsTestBase() {
         }
     """)
 
+    fun `test top-level type alias`() = doTest("""
+        type Foo =/*caret*/ i32
+    """, """
+        type Foo = i32;
+        /*caret*/
+    """)
+
+    fun `test top-level type alias with semicolon`() = doTest("""
+        type Foo = /*caret*/i32;
+    """, """
+        type Foo = i32;
+        /*caret*/
+    """)
+
+    fun `test top-level trait alias`() = doTest("""
+        trait Foo = /*caret*/Bar
+    """, """
+        trait Foo = Bar;
+        /*caret*/
+    """)
+
+    fun `test top-level constant`() = doTest("""
+        const C: i32 = /*caret*/0
+    """, """
+        const C: i32 = 0;
+        /*caret*/
+    """)
+
+    fun `test top-level extern crate`() = doTest("""
+        extern crate /*caret*/std
+    """, """
+        extern crate std;
+        /*caret*/
+    """)
+
     private fun doTest(@Language("Rust") before: String, @Language("Rust") after: String) =
         checkEditorAction(before, after, IdeActions.ACTION_EDITOR_COMPLETE_STATEMENT)
 }

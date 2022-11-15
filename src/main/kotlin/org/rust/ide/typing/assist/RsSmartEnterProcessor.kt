@@ -42,9 +42,9 @@ class RsSmartEnterProcessor : SmartEnterProcessorWithFixers() {
         loop@ for (each in atCaret.ancestors) {
             val elementType = each.node.elementType
             when {
-                elementType == LBRACE || elementType == RBRACE -> continue@loop
-                each is RsMatchArm || each.parent is RsBlock
-                    || each.parent is RsFunction || each.parent is RsStructItem -> return each
+                elementType == LBRACE || elementType == RBRACE -> continue
+                each is RsMatchArm || each is RsTypeAlias || each is RsTraitAlias || each is RsConstant || each is RsExternCrateItem
+                    || each.parent is RsBlock || each.parent is RsFunction || each.parent is RsStructItem -> return each
             }
         }
         return null
