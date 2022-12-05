@@ -3,11 +3,12 @@
 // lldb-command:run
 
 // lldb-command:print a
-// lldbr-check:[...]a = -1 [...]
-// lldbg-check:[...]$0 = -1 [...]
+// lldb-unix-check:(core::num::nonzero::NonZeroI32) a = -1 [...]
+// lldb-windows-check:(core::num::nonzero::NonZeroI32) $0 = -1 [...]
+
 // lldb-command:print b
-// lldbr-check:[...]b = 1024 [...]
-// lldbg-check:[...]$1 = 1024 [...]
+// lldb-unix-check:(core::num::nonzero::NonZeroUsize) b = 1024 [...]
+// lldb-windows-check:(core::num::nonzero::NonZeroUsize) $1 = 1024 [...]
 
 // === GDB TESTS ===================================================================================
 

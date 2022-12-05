@@ -5,80 +5,80 @@
 // lldb-command:run
 
 // lldb-command:print os_string
-// lldbr-check:[...]os_string = "abc" [...]
-// lldbg-check:[...]$0 = "abc" [...]
+// lldb-unix-check:(std::ffi::os_str::OsString) os_string = "abc" [...]
+// lldb-windows-check:(std::ffi::os_str::OsString) $0 = "abc" [...]
 
 // lldb-command:print os_string_empty
-// lldbr-check:[...]os_string_empty = "" [...]
-// lldbg-check:[...]$1 = "" [...]
+// lldb-unix-check:(std::ffi::os_str::OsString) os_string_empty = "" [...]
+// lldb-windows-check:(std::ffi::os_str::OsString) $1 = "" [...]
 
 // lldb-command:print os_string_unicode
-// lldbr-check:[...]os_string_unicode = "A∆й中" [...]
+// lldb-unix-check:(std::ffi::os_str::OsString) os_string_unicode = "A∆й中" [...]
 // TODO: support WTF-8 on Windows
 
 
 // lldb-command:print os_str
-// lldbr-check:[...]os_str = "abc" { data_ptr = [...] length = 3 }
+// lldb-unix-check:(&mut std::ffi::os_str::OsStr) os_str = "abc" { data_ptr = [...] length = 3 }
 // TODO: support `ref$<...>` and `ref_mut$<...>` type wrappings on Windows
 
 // lldb-command:print os_str_empty
-// lldbr-check:[...]os_str_empty = "" { data_ptr = [...] length = 0 }
+// lldb-unix-check:(&std::ffi::os_str::OsStr) os_str_empty = "" { data_ptr = [...] length = 0 }
 // TODO: support `ref$<...>` and `ref_mut$<...>` type wrappings on Windows
 
 // lldb-command:print os_str_unicode
-// lldbr-check:[...]os_str_unicode = "A∆й中" { data_ptr = [...] length = 9 }
+// lldb-unix-check:(&mut std::ffi::os_str::OsStr) os_str_unicode = "A∆й中" { data_ptr = [...] length = 9 }
 // TODO: support `ref$<...>` and `ref_mut$<...>` type wrappings and WTF-8 on Windows
 
 
 // lldb-command:print c_string
-// lldbr-check:[...]c_string = "abc" [...]
+// lldb-unix-check:(alloc::ffi::c_str::CString) c_string = "abc" [...]
 // MSVC LLDB without Rust support fails to print `CString` in the console (but CLion renders it fine)
 
 // lldb-command:print c_string_empty
-// lldbr-check:[...]c_string_empty = "" [...]
+// lldb-unix-check:(alloc::ffi::c_str::CString) c_string_empty = "" [...]
 // MSVC LLDB without Rust support fails to print `CString` in the console (but CLion renders it fine)
 
 // lldb-command:print c_string_unicode
-// lldbr-check:[...]c_string_unicode = "A∆й中" [...]
+// lldb-unix-check:[...]c_string_unicode = "A∆й中" [...]
 // MSVC LLDB without Rust support fails to print `CString` in the console (but CLion renders it fine)
 
 
 // lldb-command:print c_str
-// lldbr-check:[...]c_str = "abcd" { data_ptr = [...] length = 5 }
+// lldb-unix-check:(&core::ffi::c_str::CStr) c_str = "abcd" { data_ptr = [...] length = 5 }
 // TODO: support `ref$<...>` and `ref_mut$<...>` type wrappings on Windows
 
 // lldb-command:print c_str_empty
-// lldbr-check:[...]c_str_empty = "" { data_ptr = [...] length = 1 }
+// lldb-unix-check:(&core::ffi::c_str::CStr) c_str_empty = "" { data_ptr = [...] length = 1 }
 // TODO: support `ref$<...>` and `ref_mut$<...>` type wrappings on Windows
 
 // lldb-command:print c_str_unicode
-// lldbr-check:[...]c_str_unicode = "A∆й中" { data_ptr = [...] length = 10 }
+// lldb-unix-check:(&core::ffi::c_str::CStr) c_str_unicode = "A∆й中" { data_ptr = [...] length = 10 }
 // TODO: support `ref$<...>` and `ref_mut$<...>` type wrappings on Windows
 
 
 // lldb-command:print path_buf
-// lldbr-check:[...]path_buf = "/a/b/c" [...]
-// lldbg-check:[...]$12 = "/a/b/c" [...]
+// lldb-unix-check:(std::path::PathBuf) path_buf = "/a/b/c" [...]
+// lldb-windows-check:[...]$12 = "/a/b/c" [...]
 
 // lldb-command:print path_buf_empty
-// lldbr-check:[...]path_buf_empty = "" [...]
-// lldbg-check:[...]$13 = "" [...]
+// lldb-unix-check:(std::path::PathBuf) path_buf_empty = "" [...]
+// lldb-windows-check:[...]$13 = "" [...]
 
 // lldb-command:print path_buf_unicode
-// lldbr-check:[...]path_buf_unicode = "/a/b/∂" [...]
+// lldb-unix-check:[...]path_buf_unicode = "/a/b/∂" [...]
 // TODO: support WTF-8 on Windows
 
 
 // lldb-command:print path
-// lldbr-check:[...]path = "/a/b/c" { data_ptr = [...] length = 6 }
+// lldb-unix-check:[...]path = "/a/b/c" { data_ptr = [...] length = 6 }
 // TODO: support `ref$<...>` and `ref_mut$<...>` type wrappings on Windows
 
 // lldb-command:print path_empty
-// lldbr-check:[...]path_empty = "" { data_ptr = [...] length = 0 }
+// lldb-unix-check:[...]path_empty = "" { data_ptr = [...] length = 0 }
 // TODO: support `ref$<...>` and `ref_mut$<...>` type wrappings on Windows
 
 // lldb-command:print path_unicode
-// lldbr-check:[...]path_unicode = "/a/b/∂" { data_ptr = [...] length = 8 }
+// lldb-unix-check:[...]path_unicode = "/a/b/∂" { data_ptr = [...] length = 8 }
 // TODO: support `ref$<...>` and `ref_mut$<...>` type wrappings on Windows
 
 

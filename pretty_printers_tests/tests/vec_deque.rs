@@ -3,13 +3,14 @@
 // lldb-command:run
 
 // lldb-command:print d
-// lldbr-check:[...]d = size=7 { [0] = 2 [1] = 3 [2] = 4 [3] = 5 [4] = 6 [5] = 7 [6] = 8 }
-// lldbg-check:[...]$0 = size=7 { [0] = 2 [1] = 3 [2] = 4 [3] = 5 [4] = 6 [5] = 7 [6] = 8 }
-// lldb-command:print empty_d
-// lldbr-check:[...]empty_d = size=0
-// lldbg-check:[...]$1 = size=0
+// lldb-unix-check:(alloc::collections::vec_deque::VecDeque<i32, [...]>) d = size=7 { [0] = 2 [1] = 3 [2] = 4 [3] = 5 [4] = 6 [5] = 7 [6] = 8 }
+// lldb-windows-check:(alloc::collections::vec_deque::VecDeque<i32,[...]>) $0 = size=7 { [0] = 2 [1] = 3 [2] = 4 [3] = 5 [4] = 6 [5] = 7 [6] = 8 }
 
-// === LLDB TESTS ==================================================================================
+// lldb-command:print empty_d
+// lldb-unix-check:(alloc::collections::vec_deque::VecDeque<i32, [...]>) empty_d = size=0
+// lldb-windows-check:(alloc::collections::vec_deque::VecDeque<i32,[...]>) $1 = size=0
+
+// === GDB TESTS ==================================================================================
 
 // gdb-command:run
 

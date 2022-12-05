@@ -30,7 +30,6 @@ pub struct LLDBConfig {
     pub lldb_batchmode: String,
     pub lldb_lookup: String,
     pub python: String,
-    pub native_rust: bool,
 }
 
 #[derive(Clone)]
@@ -118,7 +117,7 @@ impl<'test> GDBTestRunner<'test> {
 
 impl<'test> TestRunner<'test> for GDBTestRunner<'test> {
     fn run(&self) -> TestResult {
-        let prefixes: &'static [&'static str] = &["gdb"];
+        let prefixes = vec!["gdb".to_string()];
 
         // Parse debugger commands etc from test files
         let (commands, check_lines, breakpoint_lines) = match parse_debugger_commands(self.src_path, prefixes) {
@@ -213,15 +212,16 @@ impl<'test> LLDBTestRunner<'test> {
 
 impl<'test> TestRunner<'test> for LLDBTestRunner<'test> {
     fn run(&self) -> TestResult {
-        // If `native_rust = true` in the `Settings_%os%.toml` configuration file,
-        // the test runner will execute all commands that start with `lldb` or `lldbr`.
-        // Otherwise, the test runner will execute commands that start with `lldb` or `lldbg`.
-        let prefixes = if self.config.native_rust {
-            static PREFIXES: &'static [&'static str] = &["lldb", "lldbr"];
-            PREFIXES
+        // Test runner can run commands depending on the target's platform and rustc channel.
+        // For example, to run a particular check only on Windows with rustc nightly,
+        // use `lldb-windows-nightly-check` test runner command
+        let rustc_channel = rustc_version_runtime::version_meta().channel;
+        let prefixes = if cfg!(unix) {
+            vec!["lldb".to_string(), "lldb-unix".to_string(), format!("lldb-unix-{:?}", rustc_channel).to_lowercase()]
+        } else if cfg!(windows) {
+            vec!["lldb".to_string(), "lldb-windows".to_string(), format!("lldb-windows-{:?}", rustc_channel).to_lowercase()]
         } else {
-            static PREFIXES: &'static [&'static str] = &["lldb", "lldbg"];
-            PREFIXES
+            panic!("Unsupported platform");
         };
 
         // Parse debugger commands etc from test files
@@ -288,7 +288,7 @@ impl<'test> TestRunner<'test> for LLDBTestRunner<'test> {
     }
 }
 
-fn parse_debugger_commands(src_path: &Path, debugger_prefixes: &[&str]) -> DebuggerCommands {
+fn parse_debugger_commands(src_path: &Path, debugger_prefixes: Vec<String>) -> DebuggerCommands {
     let directives = debugger_prefixes
         .iter()
         .map(|prefix|

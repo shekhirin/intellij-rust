@@ -3,24 +3,24 @@
 // lldb-command:run
 
 // lldb-command:print range
-// lldbr-check:[...]range = 1..12 [...]
-// lldbg-check:[...]$0 = 1..12 [...]
+// lldb-unix-check:(core::ops::range::Range<i32>) range = 1..12 [...]
+// lldb-windows-check:(core::ops::range::Range<i32>) $0 = 1..12 [...]
 
 // lldb-command:print range_from
-// lldbr-check:[...]range_from = 9.. [...]
-// lldbg-check:[...]$1 = 9.. [...]
+// lldb-unix-check:(core::ops::range::RangeFrom<i32>) range_from = 9.. [...]
+// lldb-windows-check:(core::ops::range::RangeFrom<i32>) $1 = 9.. [...]
 
 // lldb-command:print range_inclusive
-// lldbr-check:[...]range_inclusive = 32..=80 [...]
-// lldbg-check:[...]$2 = 32..=80 [...]
+// lldb-unix-check:(core::ops::range::RangeInclusive<i32>) range_inclusive = 32..=80 [...]
+// lldb-windows-check:(core::ops::range::RangeInclusive<i32>) $2 = 32..=80 [...]
 
 // lldb-command:print range_to
-// lldbr-check:[...]range_to = ..42 [...]
-// lldbg-check:[...]$3 = ..42 [...]
+// lldb-unix-check:(core::ops::range::RangeTo<i32>) range_to = ..42 [...]
+// lldb-windows-check:(core::ops::range::RangeTo<i32>) $3 = ..42 [...]
 
 // lldb-command:print range_to_inclusive
-// lldbr-check:[...]range_to_inclusive = ..=120 [...]
-// lldbg-check:[...]$4 = ..=120 [...]
+// lldb-unix-check:(core::ops::range::RangeToInclusive<i32>) range_to_inclusive = ..=120 [...]
+// lldb-windows-check:(core::ops::range::RangeToInclusive<i32>) $4 = ..=120 [...]
 
 // === GDB TESTS ===================================================================================
 

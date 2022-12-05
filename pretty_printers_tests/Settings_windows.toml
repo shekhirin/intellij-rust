@@ -6,4 +6,3 @@ print_stdout = true
 # Note, `python` property is intentionally missing here. See `runPrettyPrintersTests` gradle task
 lldb_batchmode = "./lldb_batchmode.py"
 lldb_lookup = "lldb_lookup"
-native_rust = false

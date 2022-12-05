@@ -5,11 +5,12 @@
 // lldb-command:run
 
 // lldb-command:print xs
-// lldbr-check:[...]xs = size=4 { [0] = { 0 = 1 1 = 10 } [1] = { 0 = 2 1 = 20 } [2] = { 0 = 3 1 = 30 } [3] = { 0 = 4 1 = 40 } }
-// lldbg-check:[...]$0 = size=4 { [0] = { 0 = 1 1 = 10 } [1] = { 0 = 2 1 = 20 } [2] = { 0 = 3 1 = 30 } [3] = { 0 = 4 1 = 40 } }
+// lldb-unix-check:(std::collections::hash::map::HashMap<u64, u64, [...]>) xs = size=4 { [0] = { 0 = 1 1 = 10 } [1] = { 0 = 2 1 = 20 } [2] = { 0 = 3 1 = 30 } [3] = { 0 = 4 1 = 40 } }
+// lldb-windows-check:(std::collections::hash::map::HashMap<u64,u64,[...]>) $0 = size=4 { [0] = { 0 = 1 1 = 10 } [1] = { 0 = 2 1 = 20 } [2] = { 0 = 3 1 = 30 } [3] = { 0 = 4 1 = 40 } }
+
 // lldb-command:print ys
-// lldbr-check:[...]ys = size=4 { [0] = 1 [1] = 2 [2] = 3 [3] = 4 }
-// lldbg-check:[...]$1 = size=4 { [0] = 1 [1] = 2 [2] = 3 [3] = 4 }
+// lldb-unix-check:(std::collections::hash::set::HashSet<u64, [...]>) ys = size=4 { [0] = 1 [1] = 2 [2] = 3 [3] = 4 }
+// lldb-windows-check:(std::collections::hash::set::HashSet<u64,[...]>) $1 = size=4 { [0] = 1 [1] = 2 [2] = 3 [3] = 4 }
 
 // === GDB TESTS ===================================================================================
 

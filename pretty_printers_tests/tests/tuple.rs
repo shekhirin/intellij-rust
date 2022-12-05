@@ -5,11 +5,13 @@
 // lldb-command:run
 
 // lldb-command:print t1
-// lldbr-check:[...]t1 = { 0 = { 0 = 1 1 = 2 } 1 = 3 }
-// lldbg-check:[...]$0 = { 0 = { 0 = 1 1 = 2 } 1 = 3 }
+// lldb-unix-check:(((i32, i32), i32)) t1 = { 0 = { 0 = 1 1 = 2 } 1 = 3 }
+// lldb-windows-check:(tuple$<tuple$<i32,i32>,i32>) $0 = { 0 = { 0 = 1 1 = 2 } 1 = 3 }
+
 // lldb-command:print t2
-// lldbr-check:[...]t2 = { 0 = "abc" [...] 1 = 42 }
-// lldbg-check:[...]$1 = { 0 = "abc" [...] 1 = 42 }
+// lldb-unix-check:((&str, i32)) t2 = { 0 = "abc" [...] 1 = 42 }
+// lldb-windows-stable-check:(tuple$<str,i32>) $1 = { 0 = "abc" [...] 1 = 42 }
+// lldb-windows-nightly-check:(tuple$<ref$<str$>,i32>) $1 = { 0 = "abc" [...] 1 = 42 }
 
 // === GDB TESTS ==================================================================================
 

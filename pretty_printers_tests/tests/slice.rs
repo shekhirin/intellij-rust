@@ -3,11 +3,12 @@
 // lldb-command:run
 
 // lldb-command:print slice
-// lldbr-check:[...]slice = size=2 { [0] = 1 [1] = 2 }
-// lldbg-check:[...]$0 = size=2 { [0] = 1 [1] = 2 }
+// lldb-unix-check:(&[i32]) slice = size=2 { [0] = 1 [1] = 2 }
+// lldb-windows-check:(slice$<i32>) $0 = size=2 { [0] = 1 [1] = 2 }
+
 // lldb-command:print slice_mut
-// lldbr-check:[...]slice_mut = size=2 { [0] = 1 [1] = 2 }
-// lldbg-check:[...]$1 = size=2 { [0] = 1 [1] = 2 }
+// lldb-unix-check:(&mut [i32]) slice_mut = size=2 { [0] = 1 [1] = 2 }
+// lldb-windows-check:(slice$<i32>) $1 = size=2 { [0] = 1 [1] = 2 }
 
 // === GDB TESTS ===================================================================================
 

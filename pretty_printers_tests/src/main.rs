@@ -37,7 +37,6 @@ struct LLDBSettings {
     python: String,
     lldb_batchmode: String,
     lldb_lookup: String,
-    native_rust: bool
 }
 
 #[derive(Deserialize)]
@@ -76,8 +75,7 @@ fn test(debugger: Debugger, path: String) -> Result<(), ()> {
                 lldb_python: path,
                 lldb_batchmode: lldb_settings.lldb_batchmode,
                 lldb_lookup: lldb_settings.lldb_lookup,
-                python: lldb_settings.python,
-                native_rust: lldb_settings.native_rust,
+                python: lldb_settings.python
             })
         },
 
