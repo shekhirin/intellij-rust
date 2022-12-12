@@ -193,6 +193,14 @@ jobs:
                       caches/modules-2/files-2.1/com.jetbrains.intellij.idea
                       caches/modules-2/files-2.1/com.jetbrains.intellij.clion
 
+            - name: Check bundled Rust formatters
+              uses: gradle/gradle-build-action@v2
+              with:
+                arguments: "runPrettyPrintersTests --no-daemon"
+                gradle-home-cache-excludes: |
+                  caches/modules-2/files-2.1/com.jetbrains.intellij.idea
+                  caches/modules-2/files-2.1/com.jetbrains.intellij.clion
+
             - name: Build
               uses: gradle/gradle-build-action@v2
               with:
@@ -225,14 +233,6 @@ jobs:
               uses: gradle/gradle-build-action@v2
               with:
                   arguments: ":plugin:verifyPlugin"
-                  gradle-home-cache-excludes: |
-                      caches/modules-2/files-2.1/com.jetbrains.intellij.idea
-                      caches/modules-2/files-2.1/com.jetbrains.intellij.clion
-
-            - name: Check bundled Rust formatters
-              uses: gradle/gradle-build-action@v2
-              with:
-                  arguments: "runPrettyPrintersTests --no-daemon"
                   gradle-home-cache-excludes: |
                       caches/modules-2/files-2.1/com.jetbrains.intellij.idea
                       caches/modules-2/files-2.1/com.jetbrains.intellij.clion
