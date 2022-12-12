@@ -191,6 +191,11 @@ jobs:
               with:
                   arguments: ":resolveDependencies -Pkotlin.incremental=false --no-daemon"
 
+            - name: Check bundled Rust formatters
+              uses: gradle/gradle-build-action@v1
+              with:
+                arguments: "runPrettyPrintersTests --no-daemon"
+
             - name: Build
               uses: gradle/gradle-build-action@v1
               with:
@@ -217,11 +222,6 @@ jobs:
               uses: gradle/gradle-build-action@v1
               with:
                   arguments: ":plugin:verifyPlugin"
-
-            - name: Check bundled Rust formatters
-              uses: gradle/gradle-build-action@v1
-              with:
-                  arguments: "runPrettyPrintersTests --no-daemon"
 
     check:
         needs: [ check-license, check-plugin ]
