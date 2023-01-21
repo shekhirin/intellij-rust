@@ -207,8 +207,14 @@ object RsCommonCompletionProvider : RsCompletionProvider() {
         val importContext = ImportContext.from(path, ImportContext.Type.COMPLETION) ?: return
         val candidates = ImportCandidatesCollector.getCompletionCandidates(importContext, result.prefixMatcher, processedPathElements)
 
+        val contextMod = path.containingMod
+
         for (candidate in candidates) {
             val item = candidate.item
+            if (item is RsOuterAttributeOwner) {
+                val isHidden = item.shouldHideElementInCompletion(contextMod)
+                if (isHidden) continue
+            }
             val scopeEntry = SimpleScopeEntry(candidate.itemName, item)
 
             if (item is RsEnumItem
@@ -250,12 +256,13 @@ object RsCommonCompletionProvider : RsCompletionProvider() {
             )
 
             if (newPath != null) {
-                val processor = filterNotCfgDisabledItemsAndTestFunctions(createProcessor { e ->
+                var processor = filterNotCfgDisabledItemsAndTestFunctions(createProcessor { e ->
                     for (candidate in candidates) {
                         result.addElement(createLookupElementWithImportCandidate(e, context, candidate))
                     }
                     false
                 })
+                processor = filterCompletionVariantsByVisibility(path, processor)
                 processPathVariants(newPath, processor)
             }
         }
