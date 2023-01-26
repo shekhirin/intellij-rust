@@ -5,20 +5,22 @@
 
 package org.rust.ide.inspections.lints
 
-import com.intellij.codeInspection.ProblemDescriptor
-import com.intellij.openapi.project.Project
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement
+import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import org.rust.RsBundle
 import org.rust.ide.annotator.getFunctionCallContext
 import org.rust.ide.inspections.RsProblemsHolder
+import org.rust.ide.inspections.RsWithMacrosInspectionVisitor
 import org.rust.ide.utils.template.newTemplateBuilder
 import org.rust.lang.core.psi.*
-import org.rust.lang.core.psi.ext.*
+import org.rust.lang.core.psi.ext.expandedStmtsAndTailExpr
+import org.rust.lang.core.psi.ext.findFirstMetaItem
 import org.rust.lang.core.types.implLookupAndKnownItems
 import org.rust.lang.core.types.ty.TyAdt
 import org.rust.lang.core.types.type
@@ -101,7 +103,7 @@ private fun inspectAndProposeFixes(expr: RsExpr): InspectionResult? {
 class RsUnusedMustUseInspection : RsLintInspection() {
     override fun getLint(element: PsiElement) = RsLint.UnusedMustUse
 
-    override fun buildVisitor(holder: RsProblemsHolder, isOnTheFly: Boolean) = object : RsVisitor() {
+    override fun buildVisitor(holder: RsProblemsHolder, isOnTheFly: Boolean) = object : RsWithMacrosInspectionVisitor() {
         override fun visitExprStmt(o: RsExprStmt) {
             super.visitExprStmt(o)
             val parent = o.parent

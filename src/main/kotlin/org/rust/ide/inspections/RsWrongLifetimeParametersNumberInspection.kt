@@ -18,7 +18,7 @@ import org.rust.lang.utils.addToHolder
 class RsWrongLifetimeParametersNumberInspection : RsLocalInspectionTool() {
 
     override fun buildVisitor(holder: RsProblemsHolder, isOnTheFly: Boolean): RsVisitor =
-        object : RsVisitor() {
+        object : RsWithMacrosInspectionVisitor() {
             override fun visitPathType(type: RsPathType) {
                 val path = type.path
 
