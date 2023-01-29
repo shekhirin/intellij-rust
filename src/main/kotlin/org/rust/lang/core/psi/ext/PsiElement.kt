@@ -143,6 +143,10 @@ inline fun <reified T : PsiElement> PsiElement.descendantOfType(predicate: (T) -
     return descendantsOfType<T>().firstOrNull(predicate)
 }
 
+@Suppress("unused")
+inline fun <reified T : PsiElement> PsiElement.stubDescendantsOfTypeStrict(): Collection<T> =
+    getStubDescendantsOfType(this, true, T::class.java)
+
 inline fun <reified T : PsiElement> PsiElement.stubDescendantsOfTypeOrSelf(): Collection<T> =
     getStubDescendantsOfType(this, false, T::class.java)
 

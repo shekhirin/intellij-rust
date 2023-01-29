@@ -3,8 +3,6 @@
  * found in the LICENSE file.
  */
 
-@file:Suppress("UnusedReceiverParameter")
-
 package org.rust.lang.core.resolve2
 
 import com.intellij.extapi.psi.PsiFileBase

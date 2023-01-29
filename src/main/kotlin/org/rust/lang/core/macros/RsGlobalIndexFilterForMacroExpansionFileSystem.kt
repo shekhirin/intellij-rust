@@ -45,7 +45,7 @@ class RsGlobalIndexFilterForMacroExpansionFileSystem : GlobalIndexFilter {
      * the plugin. Wa can avoid it.
      *
      * We disable indices only for files in [MacroExpansionFileSystem] that are under our control.
-     * It's enough to bump [STORAGE_VERSION] - old files will be deleted from [MacroExpansionFileSystem],
+     * It's enough to bump [MACRO_STORAGE_VERSION] - old files will be deleted from [MacroExpansionFileSystem],
      * hence indices will be dropped.
      */
     override fun affectsIndex(indexId: IndexId<*, *>): Boolean = false

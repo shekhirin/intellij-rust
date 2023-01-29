@@ -6,7 +6,6 @@
 package org.rust.ide.navigation.goto
 
 import com.intellij.codeInsight.navigation.actions.GotoDeclarationAction
-import com.intellij.codeInsight.navigation.actions.GotoDeclarationOnlyAction
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.AnActionResult
@@ -43,7 +42,7 @@ class RsGoToDeclarationRunningService {
         }
 
         private val AnAction.isGoToDeclaration: Boolean
-            get() = this is GotoDeclarationAction || this is GotoDeclarationOnlyAction
+            get() = this is GotoDeclarationAction
     }
 
     companion object {
