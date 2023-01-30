@@ -106,6 +106,8 @@
                                        implementationClass="org.rust.ide.hints.codeVision.RsVcsCodeVisionContext"/>
         <codeInsight.daemonBoundCodeVisionProvider
             implementation="org.rust.ide.hints.codeVision.RsReferenceCodeVisionProvider"/>
+        <codeInsight.daemonBoundCodeVisionProvider
+            implementation="org.rust.ide.hints.codeVision.RsImplementationsCodeVisionProvider"/>
 
         <!-- Filters -->
 
@@ -1233,6 +1235,9 @@
         <registryKey key="org.rust.code.vision.usage"
                      defaultValue="false"
                      description="Enable reference usage Code Vision hints for Rust" />
+        <registryKey key="org.rust.code.vision.implementation"
+                     defaultValue="false"
+                     description="Enable implementation Code Vision hints for rust"/>
 
         <!-- Move refactoring -->
 
