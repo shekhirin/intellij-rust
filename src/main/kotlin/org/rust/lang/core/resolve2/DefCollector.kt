@@ -391,7 +391,7 @@ class DefCollector(
         batch.mapNotNull { (call, def) -> expandMacro(call, def) }
 
     private fun expandMacro(call: MacroCallInfo, def: MacroDefInfo): ExpansionOutput? {
-        val defData = RsMacroDataWithHash.fromDefInfo(def, skipIdentity = false).ok() ?: return null
+        val defData = RsMacroDataWithHash.fromDefInfo(def).ok() ?: return null
         val callData = RsMacroCallDataWithHash(RsMacroCallData(call.body, defMap.metaData.env), call.bodyHash)
         val mixHash = defData.mixHash(callData) ?: return null
 

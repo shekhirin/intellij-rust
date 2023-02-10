@@ -492,6 +492,15 @@ class RsProcMacroExpansionResolveTest : RsResolveTestBase() {
         }     //^
     """)
 
+    fun `test hardcoded attr and macro attr inside a function body`() = checkByCode("""
+        fn main() {
+            #[test_proc_macros::attr_hardcoded_as_is]
+            #[test_proc_macros::attr_replace_with_attr(fn bar() {})]
+            fn foo() {}                                 //X
+            bar();
+        } //^
+    """)
+
     fun `test attr legacy macro 2`() = checkByCode("""
         use test_proc_macros::attr_hardcoded_not_a_macro;
 
