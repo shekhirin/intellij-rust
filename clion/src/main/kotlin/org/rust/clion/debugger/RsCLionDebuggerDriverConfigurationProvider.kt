@@ -15,16 +15,20 @@ import com.jetbrains.cidr.execution.debugger.backend.DebuggerDriverConfiguration
 import org.rust.debugger.RsDebuggerDriverConfigurationProvider
 
 class RsCLionDebuggerDriverConfigurationProvider : RsDebuggerDriverConfigurationProvider {
-    override fun getDebuggerDriverConfiguration(project: Project, isElevated: Boolean): DebuggerDriverConfiguration? {
+    override fun getDebuggerDriverConfiguration(
+        project: Project,
+        isElevated: Boolean,
+        emulateTerminal: Boolean
+    ): DebuggerDriverConfiguration? {
         val toolchain = CPPToolchains.getInstance().defaultToolchain ?: return null
         val isLLDBRustMSVCSupportEnabled = Registry.`is`("org.rust.debugger.lldb.rust.msvc", false)
 
         return if (toolchain.toolSet.isMSVC && isLLDBRustMSVCSupportEnabled) {
-            object : CLionLLDBDriverConfiguration(project, CPPEnvironment(toolchain), isElevated) {
+            object : CLionLLDBDriverConfiguration(project, CPPEnvironment(toolchain), isElevated, emulateTerminal) {
                 override fun useRustTypeSystem(): Boolean = true
             }
         } else {
-            createDriverConfiguration(project, CPPEnvironment(toolchain), isElevated)
+            createDriverConfiguration(project, CPPEnvironment(toolchain), isElevated, emulateTerminal)
         }
     }
 }

@@ -15,21 +15,28 @@ import org.rust.debugger.RsDebuggerToolchainService.LLDBStatus
 import java.io.File
 
 class RsDefaultDebuggerDriverConfigurationProvider : RsDebuggerDriverConfigurationProvider {
-    override fun getDebuggerDriverConfiguration(project: Project, isElevated: Boolean): DebuggerDriverConfiguration? {
+    override fun getDebuggerDriverConfiguration(
+        project: Project,
+        isElevated: Boolean,
+        emulateTerminal: Boolean
+    ): DebuggerDriverConfiguration? {
         @Suppress("MoveVariableDeclarationIntoWhen")
         val lldbStatus = RsDebuggerToolchainService.getInstance().getLLDBStatus()
         return when (lldbStatus) {
-            LLDBStatus.Bundled -> RsLLDBDriverConfiguration(isElevated)
-            is LLDBStatus.Binaries -> RsCustomBinariesLLDBDriverConfiguration(lldbStatus, isElevated)
+            LLDBStatus.Bundled -> RsLLDBDriverConfiguration(isElevated, emulateTerminal)
+            is LLDBStatus.Binaries -> RsCustomBinariesLLDBDriverConfiguration(lldbStatus, isElevated, emulateTerminal)
             else -> null
         }
     }
 }
 
 open class RsLLDBDriverConfiguration(
-    private val isElevated: Boolean
+    private val isElevated: Boolean,
+    private val emulateTerminal: Boolean
 ) : LLDBDriverConfiguration() {
     override fun isElevated(): Boolean = isElevated
+
+    override fun emulateTerminal(): Boolean = emulateTerminal
 
     override fun useRustTypeSystem(): Boolean =
         SystemInfo.isWindows && Registry.`is`("org.rust.debugger.lldb.rust.msvc", false)
@@ -37,8 +44,9 @@ open class RsLLDBDriverConfiguration(
 
 private class RsCustomBinariesLLDBDriverConfiguration(
     private val binaries: LLDBStatus.Binaries,
-    isElevated: Boolean
-) : RsLLDBDriverConfiguration(isElevated) {
+    isElevated: Boolean,
+    emulateTerminal: Boolean
+) : RsLLDBDriverConfiguration(isElevated, emulateTerminal) {
     override fun getDriverName(): String = "Rust LLDB"
     override fun useSTLRenderers(): Boolean = false
     override fun getLLDBFrameworkFile(architectureType: ArchitectureType): File = binaries.frameworkFile
